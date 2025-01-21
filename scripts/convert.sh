@@ -81,6 +81,16 @@ if [ ! -f "$PYTHON_SCRIPT_NAME" ]; then
     exit 1
 fi
 
+# Check if openapi_source is a URL and download it if necessary
+if [[ "$openapi_source" =~ ^https?:// ]]; then
+    echo "Downloading OpenAPI specification from URL..."
+    curl -o openapi.yaml "$openapi_source" || {
+        echo "Error: Failed to download OpenAPI specification"
+        exit 1
+    }
+    openapi_source="openapi.yaml"
+fi
+
 # Check Python installation
 if ! command -v python3 >/dev/null 2>&1; then
     echo "Error: Python 3 is required but not installed."
