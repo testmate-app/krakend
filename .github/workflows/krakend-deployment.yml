@@ -28,6 +28,7 @@ jobs:
       - name: Generate Krakend Config
         working-directory: ./scripts
         run: |
+          chmod +x ./convert.sh
           ./convert.sh -f "${{ github.event.inputs.updated_service_name }}:${{ github.event.inputs.updated_service_port }}/api-docs.yaml" -o settings/${{ github.event.inputs.updated_service_name }}.json
       # Krakend will validate in portainer
       # - name: Validate Krakend Configuration
