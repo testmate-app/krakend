@@ -15,6 +15,9 @@ class OpenAPIToKrakenD:
         
     def _load_spec(self) -> Dict:
         """Load OpenAPI specification from URL or file"""
+        if not self.openapi_source.startswith(('http://', 'https://')):
+            self.openapi_source = 'https://' + self.openapi_source
+
         if self.openapi_source.startswith(('http://', 'https://')):
             headers = {}
             if self.bearer_token:
