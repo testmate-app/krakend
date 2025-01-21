@@ -21,24 +21,23 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+
       - name: Receive inputs
         run: |
           echo "Updated Service: ${{ github.event.inputs.updated_service_name }}"
           echo "Swagger File: ${{ github.event.inputs.updated_service_name }}:${{ github.event.inputs.updated_service_port }}/v3/api-docs"
+
       - name: Generate Krakend Config
         working-directory: ./scripts
         run: |
           chmod +x ./convert.sh
           ./convert.sh -f "${{ github.event.inputs.updated_service_name }}:${{ github.event.inputs.updated_service_port }}/api-docs.yaml" -o settings/${{ github.event.inputs.updated_service_name }}.json
-      # Krakend will validate in portainer
-      # - name: Validate Krakend Configuration
-      #   run: |
-      #     if [ -f "${{ github.event.inputs.updated_service_name }}.json" ]; then
-      #       docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace devopsfaith/krakend check -c ${{ github.event.inputs.updated_service_name }}.json
-      #     else
-      #       echo "Configuration file not found: ${{ github.event.inputs.updated_service_name }}.json"
-      #       exit 1
-      #     fi
+
+      - name: Configure Git Token
+        run: git remote set-url origin "https://${{ secrets.GHX_TOKEN }}@github.com/testmate-app/krakend.git"
+        env:
+          GHX_TOKEN: ${{ secrets.GHX_TOKEN }}
+
       - name: Commit and Push Config to KrakenD Repo
         env:
           GITHUB_TOKEN: ${{ secrets.GHX_TOKEN }}
@@ -47,17 +46,18 @@ jobs:
           git config --global user.email "actions@github.com"
           # Check if branch exists
           if git show-ref --verify --quiet "refs/heads/update-krakend-config-${{ github.event.inputs.updated_service_name }}"; then
-            git checkout "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
+          git checkout "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
           else
-            git checkout -b "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
+          git checkout -b "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
           fi
           if git add scripts/settings/${{ github.event.inputs.updated_service_name }}.json; then
-            git commit -m "Update KrakenD config based on Swagger API for ${{ github.event.inputs.updated_service_name }}"
-            git push "https://${GITHUB_TOKEN}@github.com/testmate-app/krakend.git" "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
+          git commit -m "Update KrakenD config based on Swagger API for ${{ github.event.inputs.updated_service_name }}"
+          git push "https://${{ secrets.GHX_TOKEN }}@github.com/testmate-app/krakend.git" "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
           else
-            echo "No changes to commit"
-            exit 0
+          echo "No changes to commit"
+          exit 0
           fi
+
   trigger-redeploy:
     name: Trigger Redeployment Webhook
     runs-on: ubuntu-latest
