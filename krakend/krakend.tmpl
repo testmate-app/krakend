@@ -1,0 +1,13 @@
+{
+    "$schema": "https://www.krakend.io/schema/v3.json",
+    "version": 3,
+    "name": "{{ env "SERVICE_NAME" }} ({{ ._config.environment }})",
+    "port": {{ ._config.port }},
+    "timeout": "{{ ._config.timeout }}",
+    "cache_ttl":  "{{ ._config.cache_ttl }}",
+    "output_encoding": "{{ ._config.output_encoding }}",
+    "extra_config": {{ marshal ._config.extra_config }},
+    "endpoints": [
+        {{ template "_endpoints.tmpl" . }}
+]
+}

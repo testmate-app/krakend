@@ -1,0 +1,17 @@
+{{ range $idx, $endpoint := .academics.endpoints }}
+    {{- if $idx }},{{ end }}
+    {
+        "endpoint": "{{ $endpoint.endpoint }}",
+        "output_encoding": "{{ $endpoint.output_encoding }}",
+        "backend": [
+            {{- range $bidx, $backend := $endpoint.backend }}
+            {{- if $bidx }},{{ end }}
+            {
+                "host": {{ marshal $backend.host }},
+                "url_pattern": "{{ $backend.url_pattern }}",
+                "encoding": "{{ $backend.encoding }}"
+            }
+            {{- end }}
+        ]
+    }
+{{- end }}

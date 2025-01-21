@@ -1,0 +1,10 @@
+{
+  "name": "USU Web API Gateway",
+  "port": 8080,
+  "environment": "DEVELOPMENT",
+  "default_host": "http://localhost:8080",
+  "timeout": "3s",
+  "cache_ttl": "3s",
+  "output_encoding": "json",
+  "extra_config": {}
+}

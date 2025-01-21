@@ -1,0 +1,8 @@
+[*]
+indent_style = space
+indent_size = 2
+file_extensions = hbs, handlebars, tmpl
+
+[*.{tmpl}]
+indent_style = space
+indent_size = 2

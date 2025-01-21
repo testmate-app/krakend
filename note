@@ -1,0 +1,8 @@
+Flow:
+
+Developer push ke repo backend
+GitHub Action ter-trigger
+Generate KrakenD config baru
+Push ke repo KrakenD
+Webhook menerima notifikasi
+Update config dan restart service di Swarm

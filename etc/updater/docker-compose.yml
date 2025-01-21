@@ -1,0 +1,59 @@
+services:
+    krakend-updater:
+        build: .
+        image: updater:latest
+        environment:
+            - PORTAINER_URL=${PORTAINER_URL}
+            - PORTAINER_USERNAME=${PORTAINER_USERNAME}
+            - PORTAINER_PASSWORD=${PORTAINER_PASSWORD}
+            - PORTAINER_ENDPOINT=${PORTAINER_ENDPOINT}
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+        volumes:
+            - krakend_config:/krakend-config
+        ports:
+            - "5000:5000"
+            - "8002:8000"
+        deploy:
+            mode: replicated
+            replicas: 1
+            placement:
+                constraints:
+                    - node.role == manager
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                max_attempts: 3
+                window: 120s
+            update_config:
+                parallelism: 1
+                delay: 10s
+                order: start-first
+                failure_action: rollback
+            resources:
+                limits:
+                    cpus: "0.50"
+                    memory: 512M
+                reservations:
+                    cpus: "0.25"
+                    memory: 256M
+        depends_on:
+            - redis
+
+    redis:
+        image: redis:6.2-alpine
+        command: redis-server --appendonly yes
+        volumes:
+            - redis_data:/data
+        deploy:
+            placement:
+                constraints:
+                    - node.role == manager
+            restart_policy:
+                condition: on-failure
+
+volumes:
+    krakend_config:
+        driver: local
+    redis_data:
+        driver: local

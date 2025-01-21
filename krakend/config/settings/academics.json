@@ -1,0 +1,24 @@
+{
+    "endpoints": [
+        {
+            "endpoint": "/v1/admin/affairs/study-ca2rd/sync/billings",
+            "method": "POST",
+            "backend_url_pattern": "/__debug/dev",
+            "backend_method": "GET",
+            "backend_host": "http://localhost:8080",
+            "output_encoding": "no-op",
+            "timeout": "3600s",
+            "input_query_strings": [],
+            "backend": [
+                {
+                    "url_pattern": "/admin/affairs/study-card/sync/ipk",
+                    "encoding": "no-op",
+                    "method": "POST",
+                    "host": ["http://localhost:8080"],
+                    "disable_host_sanitize": false
+                }
+            ],
+            "input_headers": ["Content-Type"]
+        }
+    ]
+}

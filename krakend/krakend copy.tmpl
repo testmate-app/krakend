@@ -1,0 +1,25 @@
+{{ $user := .user.endpoints }}
+{{ $invoice := .invoice.endpoints }}
+
+{{
+   $endpoints := concat
+   $user
+   $invoice
+}}
+
+{{ $endpointsJson := toJson $endpoints }}
+
+{
+  "$schema": "https://www.krakend.io/schema/v3.json",
+  "name": "{{ ._config.name }}",
+  "timeout": "50000ms",
+  "cache_ttl": "0s",
+  "version": 3,
+  "port": 8080,
+  "output_encoding": "json",
+  "endpoints": [
+    {{ $endpointsJson | trimSuffix "]" }},
+    {{ template "endpoints.tmpl" . | toJson | trimPrefix "[" | trimSuffix "]" }}
+  ],
+  "extra_config": {{ marshal ._config.extra_config }}
+}

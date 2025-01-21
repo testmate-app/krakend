@@ -1,0 +1,9 @@
+.idea
+*.iml
+build
+krakend.json
+swagger/*
+!swagger/.gitkeep
+!swagger/pet-store.json
+.env
+.DS_Store

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://www.krakend.io/schema/v3.json",
+  "name": "Tenian",
+  "timeout": "50000ms",
+  "cache_ttl": "0s",
+  "version": 3,
+  "port": 8080,
+  "output_encoding": "json",
+  "endpoints": [
+    {
+      "backend": [
+        {
+          "encoding": "no-op",
+          "host": ["https://my.host.com"],
+          "url_pattern": "/foo"
+        }
+      ],
+      "endpoint": "/foo",
+      "output_encoding": "no-op"
+    },
+    {
+      "backend": [
+        {
+          "encoding": "no-op",
+          "host": ["https://my.host.com"],
+          "url_pattern": "/bar"
+        }
+      ],
+      "endpoint": "/bar",
+      "output_encoding": "no-op"
+    },
+    {
+      "backend": [
+        {
+          "encoding": "no-op",
+          "host": ["https://my.host.com"],
+          "url_pattern": "/foo"
+        }
+      ],
+      "endpoint": "/foo1",
+      "output_encoding": "no-op"
+    },
+    {
+      "backend": [
+        {
+          "encoding": "no-op",
+          "host": ["https://my.host.com"],
+          "url_pattern": "/bar"
+        }
+      ],
+      "endpoint": "/bar1",
+      "output_encoding": "no-op"
+    }
+  ],
+  "extra_config": {}
+}
