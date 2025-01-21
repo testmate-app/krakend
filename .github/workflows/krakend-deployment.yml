@@ -22,6 +22,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Install SSH Key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Setup Git Config
+        run: |
+          git config --global user.name "fikihfirmansyah"
+          git config --global user.email "fikihfirmansyah43@gmail.com"
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
       - name: Receive inputs
         run: |
           echo "Updated Service: ${{ github.event.inputs.updated_service_name }}"
@@ -33,26 +45,20 @@ jobs:
           chmod +x ./convert.sh
           ./convert.sh -f "${{ github.event.inputs.updated_service_name }}:${{ github.event.inputs.updated_service_port }}/api-docs.yaml" -o settings/${{ github.event.inputs.updated_service_name }}.json
 
-      - name: Configure Git Token
-        run: git remote set-url origin "https://${{ secrets.GHX_TOKEN }}@github.com/testmate-app/krakend.git"
-        env:
-          GHX_TOKEN: ${{ secrets.GHX_TOKEN }}
-
       - name: Commit and Push Config to KrakenD Repo
-        env:
-          GITHUB_TOKEN: ${{ secrets.GHX_TOKEN }}
         run: |
-          git config --global user.name "fikihfirmansyah"
-          git config --global user.email "fikihfirmansyah43@gmail.com"
           # Check if branch exists
           if git show-ref --verify --quiet "refs/heads/update-krakend-config-${{ github.event.inputs.updated_service_name }}"; then
             git checkout "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
           else
             git checkout -b "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
           fi
+
+          git remote set-url origin git@github.com:testmate-app/krakend.git
+
           if git add scripts/settings/${{ github.event.inputs.updated_service_name }}.json; then
             git commit -m "Update KrakenD config based on Swagger API for ${{ github.event.inputs.updated_service_name }}"
-            git push "https://${{ secrets.GHX_TOKEN }}@github.com/testmate-app/krakend.git" "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
+            git push origin "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
           else
             echo "No changes to commit"
             exit 0
