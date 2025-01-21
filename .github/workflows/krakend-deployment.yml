@@ -10,9 +10,6 @@ on:
         description: The updated service port
         required: true
         default: "8080"
-  push:
-    branches:
-      - main
 
 jobs:
   generate-validate-push-config:
@@ -27,49 +24,36 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Debug SSH
+        run: |
+          ssh-add -l
+          ls -la ~/.ssh
+          echo "Testing SSH connection to GitHub..."
+          ssh -T git@github.com -v
+
       - name: Setup Git Config
         run: |
           git config --global user.name "fikihfirmansyah"
           git config --global user.email "fikihfirmansyah43@gmail.com"
           mkdir -p ~/.ssh
           ssh-keyscan github.com >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
-      - name: Receive inputs
-        run: |
-          echo "Updated Service: ${{ github.event.inputs.updated_service_name }}"
-          echo "Swagger File: ${{ github.event.inputs.updated_service_name }}:${{ github.event.inputs.updated_service_port }}/v3/api-docs"
-
-      - name: Generate Krakend Config
-        working-directory: ./scripts
-        run: |
-          chmod +x ./convert.sh
-          ./convert.sh -f "${{ github.event.inputs.updated_service_name }}:${{ github.event.inputs.updated_service_port }}/api-docs.yaml" -o settings/${{ github.event.inputs.updated_service_name }}.json
-
-      - name: Commit and Push Config to KrakenD Repo
+      - name: Commit and Push Config
         run: |
           # Check if branch exists
-          if git show-ref --verify --quiet "refs/heads/update-krakend-config-${{ github.event.inputs.updated_service_name }}"; then
-            git checkout "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
+          if git show-ref --verify --quiet "refs/heads/update-krakend-config-api.mate.institute"; then
+            git checkout "update-krakend-config-api.mate.institute"
           else
-            git checkout -b "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
+            git checkout -b "update-krakend-config-api.mate.institute"
           fi
 
           git remote set-url origin git@github.com:testmate-app/krakend.git
 
-          if git add scripts/settings/${{ github.event.inputs.updated_service_name }}.json; then
-            git commit -m "Update KrakenD config based on Swagger API for ${{ github.event.inputs.updated_service_name }}"
-            git push origin "update-krakend-config-${{ github.event.inputs.updated_service_name }}"
+          if git add scripts/settings/api.mate.institute.json; then
+            git commit -m "Update KrakenD config based on Swagger API for api.mate.institute"
+            GIT_SSH_COMMAND='ssh -v' git push origin "update-krakend-config-api.mate.institute"
           else
             echo "No changes to commit"
             exit 0
           fi
-
-  trigger-redeploy:
-    name: Trigger Redeployment Webhook
-    runs-on: ubuntu-latest
-    needs: generate-validate-push-config
-    if: "${{ success() }}"
-    steps:
-      - name: Trigger Portainer Webhook for Redeployment
-        run: |
-          curl --insecure -X POST ${{ secrets.WEB_HOOK }}
