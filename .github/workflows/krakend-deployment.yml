@@ -48,7 +48,7 @@ jobs:
           git checkout -b update-krakend-config-${{ github.event.inputs.updated_service_name }}
           git add scripts/settings/${{ github.event.inputs.updated_service_name }}.json
           git commit -m "Update KrakenD config based on Swagger API for ${{github.event.inputs.updated_service_name }}"
-          git push https://x-access-token:${{ secrets.GHX_TOKEN }}@github.com/testmate-app/krakend.git update-krakend-config-api.mate.institute
+          git push https://fikihfirmansyah:${{ secrets.GHX_TOKEN }}@github.com/testmate-app/krakend.git update-krakend-config-api.mate.institute
         # run: >
         # git config --global user.name "GitHub Actions Bot"
         # git config --global user.email "actions@github.com"
